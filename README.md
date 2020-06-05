@@ -6,9 +6,9 @@ Ces contributeurs sont :
 
 - Allan B (AchtungAlarm)
 - Fabien D
+- Cristina L
 - Naomi S
 - Clément S
-- Marina M
 
 ## Le but de ce projet
 
