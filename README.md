@@ -4,10 +4,10 @@ Projet Web INF tc3 du groupe A2B qui a choisi le projet : l'Afrique
 
 Ces contributeurs sont :
 
-- Allan B (AchtungAlarm)
+- Allan B (achtungalarm)
 - Fabien D
 - Cristina L
-- Naomi S
+- Naomi S (atewdrew)
 - Clément S
 
 ## Le but de ce projet
