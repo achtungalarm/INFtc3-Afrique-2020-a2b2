@@ -30,7 +30,14 @@ def get_name(info):
 def get_capital(info):
     """Extract the capital of the contry. May return None"""
     try:
-        m = re.match('\[\[((\w+\s)*\w+)\]\]', info['capital'])
+        cap = info['capital']
+        cap = cap[cap.index('['):cap.index(']')+2]
+        m = re.match('\[\[((\w+\s)*(\w+-)*(\w+\')*\w+)\]\]',cap)
+        if m is None:
+            m =re.match('\[\[(\w+)\,\s(\w+)\|(\w+)\]\]', cap)
+        if m is None:
+            cap = cap[:cap.index('(')]
+            m =re.match('\[\[(\w+)\s', cap)
         k = m.group(1)
         return k
     except:
@@ -40,44 +47,49 @@ def get_coords(info):
     """Extract the coordinates of the contry. May return None
     Coordinates are positive or negative real number."""
     try:
-        l = re.match('{{Coord\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|type:city}}', info['coordinates'])
-        lo = (int(l.group(1)) + int(l.group(2)) / 60) * ((l.group(3) == 'N') * 2 - 1)
-        la = (int(l.group(4)) + int(l.group(5)) / 60) * ((l.group(6) == 'E') * 2 - 1)
+        coo = info['coordinates']
+    except:
+        return None
+    try:
+        i = coo.index('E')
+    except:
+        i = coo.index('W')
+    try:
+        coo = coo[:i+1]
+        l = re.match('{{coord\s*\|\s*(\w+)\s*\|\s*(\w+.*\w*)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+.*\w*)\s*\|\s*(\w+)\s*', coo.lower())
+        if l is None:
+            l = re.match('{{coord\s*\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)', coo.lower())
+            lo = (int(l.group(1)) + int(l.group(2)) / 60 +  int(l.group(3)) / 3600) * ((l.group(4) == 'n') * 2 - 1)
+            la = (int(l.group(5)) + int(l.group(6)) / 60 +  int(l.group(7)) / 3600) * ((l.group(8) == 'e') * 2 - 1)
+            return {'lat':la, 'lon':lo}
+        lo = (int(l.group(1)) + float(l.group(2)) / 60) * ((l.group(3) == 'n') * 2 - 1)
+        la = (int(l.group(4)) + float(l.group(5)) / 60) * ((l.group(6) == 'e') * 2 - 1)
         return {'lat':la, 'lon':lo}
     except:
         return None
 
 def save_country(conn, country, info):
-    """This function saves data of a country in the data base. May fill with NULL"""
-    
-    sql = 'INSERT INTO countries VALUES (?, ?, ?, ?, ?)'        # SQL command
+    sql = 'INSERT INTO countries VALUES (?, ?, ?, ?, ?)'
     name = get_name(info)
     capital = get_capital(info)
     coords = get_coords(info)
-    if name is None or capital is None or coords is None:       # If one data is not found
-        temp = get_info(country)                                # We extract datas from wikipedia
-        if name is None:                                        # Then try to refresh them
-            name = get_name(temp)
-        if capital is None:
-            capital = get_capital(temp)
-        if coords is None:
-            coords = get_coords(temp)
-    if name is None:                                            # But the data can be not found
-        name = "NULL"                                           # In this case, they are replaced by NULL
-    if capital is None:
-        capital = "NULL"
     if coords is None:
-        coords = {'lat' : "NULL", 'lon' : "NULL"}
-    c = conn.cursor()                                           # Data base is opened
+        dat = get_info(capital)
+        coords = get_coords(dat)
+    c = conn.cursor()
     c.execute(sql, (country, name, capital, coords['lat'], coords['lon']))
-    conn.commit()                                               # Then closed (refresh)
+    conn.commit()
     return
 
-def read_country(conn, country):
+def read_country(conn, country=None):
     """This function extracts data in the data base"""
     c = conn.cursor()
-    sql = 'SELECT * FROM countries WHERE wp = ?'
-    inf = c.execute(sql, (country, ))
+    if country is None:
+        sql = 'SELECT * FROM countries'
+        inf = c.execute(sql, (country, ))
+    else:
+        sql = 'SELECT * FROM countries WHERE wp = ?'
+        inf = c.execute(sql, (country, ))
     t = inf.fetchall()
     conn.commit()
     if t == []:
@@ -105,8 +117,5 @@ def save_all(file, conn):
     with ZipFile(file + '.zip','r') as z:
         for i in range(len(z.namelist())):
             rd = json.loads(z.read(z.namelist()[i]))
-            try:
-                save_country(conn, z.namelist()[i][:-5], rd)
-            except:
-                pass
+            save_country(conn, z.namelist()[i][:-5], rd)
     return
