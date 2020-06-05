@@ -10,6 +10,8 @@ Ces contributeurs sont :
 - Naomi S (atewdrew)
 - Clément S
 
+tous droits réservés.
+
 ## Le but de ce projet
 
 Nous devons créer un serveur web qui devra présenter le continent africain, ses pays et diverses informations à travers une interface web. 
