@@ -10,38 +10,34 @@ conn = sqlite3.connect('pays.sqlite')           # Base de données avec laquelle
 
 def get_info(name):
     """This function extracts datas from the Wikipedia page with the name name."""
-    page = wptools.page(name)
-    page.get_parse(False)
-    return page.data['infobox']
+    page = wptools.page(name)                   # On va sur Wikipedia
+    page.get_parse(False)                       # On regroupe les informations
+    return page.data['infobox']                 # On renvoie les données du bandeau de droite de Wikipédia
 
 def print_capital(info):
-    """This function prints raw datas such as capital and coordinates"""
+    """This function prints json datas such as capital and coordinates"""
     k = info['capital']
     c = info['coordinates']
     return k, c
 
 def get_name(info):
     """Extract the name of the contry. May return None"""
-    try:
-        return info['conventional_long_name']
-    except:
-        return None
+    return info['conventional_long_name']
+
 
 def get_capital(info):
     """Extract the capital of the contry. May return None"""
-    try:
-        cap = info['capital']
-        cap = cap[cap.index('['):cap.index(']')+2]
-        m = re.match('\[\[((\w+\s)*(\w+-)*(\w+\')*\w+)\]\]',cap)
-        if m is None:
-            m =re.match('\[\[(\w+)\,\s(\w+)\|(\w+)\]\]', cap)
-        if m is None:
-            cap = cap[:cap.index('(')]
-            m =re.match('\[\[(\w+)\s', cap)
-        k = m.group(1)
-        return k
-    except:
-        return None
+    cap = info['capital']
+    cap = cap[cap.index('['):cap.index(']')+2]
+    m = re.match('\[\[((\w+\s)*(\w+-)*(\w+\')*\w+)\]\]',cap)
+    if m is None:
+        m =re.match('\[\[(\w+)\,\s(\w+)\|(\w+)\]\]', cap)
+    if m is None:
+        cap = cap[:cap.index('(')]
+        m =re.match('\[\[(\w+)\s', cap)
+    k = m.group(1)
+    return k
+
 
 def get_coords(info):
     """Extract the coordinates of the contry. May return None
