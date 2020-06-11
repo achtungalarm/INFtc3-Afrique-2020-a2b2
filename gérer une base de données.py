@@ -6,7 +6,12 @@ import sqlite3                                  # Cette librairie nous permet de
 from zipfile import ZipFile                     # Cette librairie nous permet de gérer les fichiers compressés
 import json                                     # Cette librairie nous permet de gérer les fichiers json
 
-conn = sqlite3.connect('pays.sqlite')           # Base de données avec laquelle on travaille
+conn = sqlite3.connect('pays.sqlite')  
+
+def get_all(country):                            # Base de données du TD1                                         
+    page = wptools.page(country,silent=True)     # Tester si le programme marche
+    page.get_parse(False)
+    return(page.data['infobox'])e
 
 def get_info(name):
     """This function extracts datas from the Wikipedia page with the name name."""
