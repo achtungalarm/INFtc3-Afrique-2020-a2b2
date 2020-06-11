@@ -1,9 +1,9 @@
-#
+##
 # Conversion d'une chaîne de caractère décrivant une position géographique
 # en coordonnées numériques latitude et longitude
 #
 def cv_coords(str_coords):
-    # on découpe au niveau des "|" 
+    # on découpe au niveau des "|"
     c = str_coords.split('|')
 
     # on extrait la latitude en tenant compte des divers formats
@@ -53,8 +53,6 @@ def cv_coords(str_coords):
         lon += float(c.pop(0))/60
         lon += float(c.pop(0))/3600
         c.pop(0)
-    
+
     # on renvoie un dictionnaire avec les deux valeurs
     return {'lat':lat, 'lon':lon }
-
-
