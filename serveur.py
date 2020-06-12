@@ -45,6 +45,28 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     elif self.path_info[0] == 'service' and self.path_info[1] == 'country' and len(self.path_info) > 2:
       self.send_json_country(self.path_info[2])
 
+    elif self.path_info[0] == "location":
+      D = self.db_get_countries()
+      data=[]
+      for i in range(len(D)):
+        data.append({'id':i,'lat':D[i]['latitude'],'lon':D[i]['longitude'],'name':D[i]['wp']})
+      self.send_json(data)
+
+    # requete description - retourne la description du lieu dont on passe l'id en paramètre dans l'URL
+    elif self.path_info[0] == "description":
+      data=[{'id':1,'desc':"Il ne faut pas être <b>trop grand</b> pour marcher dans cette rue qui passe sous une maison"},
+            {'id':2,'desc':"Cette rue est <b>si étroite</b> qu'on touche les 2 côtés en tendant les bras !"},
+            {'id':3,'desc':"Ce jardin <b>méconnu</b> évoque le palais idéal du Facteur Cheval"}]
+      for c in data:
+        if c['id'] == int(self.path_info[1]):
+          self.send_json(c)
+          break
+
+    # requête générique
+    elif self.path_info[0] == "service":
+      self.send_html('<p>Path info : <code>{}</p><p>Chaîne de requête : <code>{}</code></p>' \
+          .format('/'.join(self.path_info),self.query_string));
+
     # ou pas...
     else:
       self.send_static()
@@ -150,7 +172,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
       body += '<main>'
       body += '<h1>{}</h1>'.format(r['name'])
       body += '<ul>'
-      body += '<li>{}: {}</li>'.format('Continent',r['continent'].capitalize())
+#      body += '<li>{}: {}</li>'.format('Continent',r['continent'].capitalize())
       body += '<li>{}: {}</li>'.format('Capital',r['capital'])
       body += '<li>{}: {:.3f}</li>'.format('Latitude',r['latitude'])
       body += '<li>{}: {:.3f}</li>'.format('Longitude',r['longitude'])
@@ -235,7 +257,23 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     # on envoie le corps de la réponse
     self.wfile.write(data)
 
- 
+  def send_html(self,content):
+     headers = [('Content-Type','text/html;charset=utf-8')]
+     html = '<!DOCTYPE html><title>{}</title><meta charset="utf-8">{}' \
+         .format(self.path_info[0],content)
+     self.send(html,headers)
+
+  # on envoie un contenu encodé en json
+  def send_json(self,data,headers=[]):
+    body = bytes(json.dumps(data),'utf-8') # encodage en json et UTF-8
+    self.send_response(200)
+    self.send_header('Content-Type','application/json')
+    self.send_header('Content-Length',int(len(body)))
+    [self.send_header(*t) for t in headers]
+    self.end_headers()
+    self.wfile.write(body)
+
+    
 #
 # Ouverture d'une connexion avec la base de données
 #
