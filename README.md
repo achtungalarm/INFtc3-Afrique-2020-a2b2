@@ -11,7 +11,8 @@ Ces contributeurs sont :
 - Clément S (clement-sautiere)
 
 tous droits réservés.
-coum
+coucoun mimosa
+
 
 cou 
 ## Le but de ce projet
