@@ -53,34 +53,40 @@ def get_coords(info):
         return None
     try:
         i = coo.index('E')
-    except:
-        i = coo.index('W')
-    try:
         coo = coo[:i+1]
-        l = re.match('{{coord\s*\|\s*(\w+)\s*\|\s*(\w+.*\w*)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+.*\w*)\s*\|\s*(\w+)\s*', coo.lower())
+    except:
+        try:
+            i = coo.index('W')
+            coo = coo[:i+1]
+        except:
+            pass
+    try:
+        l = re.match('{{coord\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)', coo.lower())
+        if l is not None:
+            if l.group(6) != 'e' and l.group(6) != 'w':
+                l = None
         if l is None:
-            l = re.match('{{coord\s*\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)\|(\w+)', coo.lower())
-            lo = (int(l.group(1)) + int(l.group(2)) / 60 +  int(l.group(3)) / 3600) * ((l.group(4) == 'n') * 2 - 1)
-            la = (int(l.group(5)) + int(l.group(6)) / 60 +  int(l.group(7)) / 3600) * ((l.group(8) == 'e') * 2 - 1)
-            return {'lat':la, 'lon':lo}
-        lo = (int(l.group(1)) + float(l.group(2)) / 60) * ((l.group(3) == 'n') * 2 - 1)
-        la = (int(l.group(4)) + float(l.group(5)) / 60) * ((l.group(6) == 'e') * 2 - 1)
-        return {'lat':la, 'lon':lo}
+            l = re.match('{{coord\s*\|\s*(\w+)\s*\|\s*(\w+).(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+).(\w+)\s*\|\s*(\w+)', coo.lower())
+        if l is None:
+            l = re.match('{{coord\s*\|\s*(\w+)\s*\|\s*(\w+)\|(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\s*\|\s*(\w+)\|(\w+)\s*\|\s*(\w+)', coo.lower())
+        if l is None:
+            coo = coo[:coo.index('t')]
+            l = re.match('{{coord\|(\w+).(\w+)\|-(\w+).(\w+)\|', coo.lower())
+        try:
+            la = (int(l.group(1)) + int(l.group(2)) / 60 +  int(l.group(3)) / 3600) * ((l.group(4) == 'n') * 2 - 1)
+            lo = (int(l.group(5)) + int(l.group(6)) / 60 +  int(l.group(7)) / 3600) * ((l.group(8) == 'e') * 2 - 1)
+            return {'lat':lo, 'lon':la}
+        except:
+            try:
+                la = (int(l.group(1)) + float(l.group(2)) / 60) * ((l.group(3) == 'n') * 2 - 1)
+                lo = (int(l.group(4)) + float(l.group(5)) / 60) * ((l.group(6) == 'e') * 2 - 1)
+                return {'lat':lo, 'lon':la}
+            except:
+                la = int(l.group(1)) + int(l.group(2)) / 100
+                lo = -int(l.group(3)) - int(l.group(4)) / 100
+                return {'lat': lo, 'lon': la}
     except:
         return None
-
-def save_country(conn, country, info):
-    sql = 'INSERT INTO countries VALUES (?, ?, ?, ?, ?)'
-    name = get_name(info)
-    capital = get_capital(info)
-    coords = get_coords(info)
-    if coords is None:
-        dat = get_info(capital)
-        coords = get_coords(dat)
-    c = conn.cursor()
-    c.execute(sql, (country, name, capital, coords['lat'], coords['lon']))
-    conn.commit()
-    return
 
 def read_country(conn, country=None):
     """This function extracts data in the data base"""
