@@ -101,6 +101,7 @@ def read_country(conn, country=None):
 
 def edit_country(conn, country, capital=None, lon=None, lat=None):
     """This functon allow us to edit datas in Data base"""
+    c = conn.cursor()
     sql = 'UPDATE countries SET '
     s = (country, )
     if capital is not None:
