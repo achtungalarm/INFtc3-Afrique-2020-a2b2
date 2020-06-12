@@ -91,12 +91,8 @@ def get_coords(info):
 def read_country(conn, country=None):
     """This function extracts data in the data base"""
     c = conn.cursor()
-    if country is None:
-        sql = 'SELECT * FROM countries'
-        inf = c.execute(sql, (country, ))
-    else:
-        sql = 'SELECT * FROM countries WHERE wp = ?'
-        inf = c.execute(sql, (country, ))
+    sql = 'SELECT * FROM countries ' + (country is not None) * 'WHERE wp = ?'
+    inf = c.execute(sql, (country, ))
     t = inf.fetchall()
     conn.commit()
     if t == []:
@@ -105,18 +101,37 @@ def read_country(conn, country=None):
 
 def edit_country(conn, country, capital=None, lon=None, lat=None):
     """This functon allow us to edit datas in Data base"""
-    c = conn.cursor()
     sql = 'UPDATE countries SET '
+    s = (country, )
     if capital is not None:
-        sql += 'capital = {}, \n'.format(capital)
+        sql += 'capital = ?, \n'.format(capital)
+        s = (capital, country)
     if lon is not None:
         sql += 'longitude = {}, \n'.format(lon)
     if lat is not None:
         sql += 'latitude = {}, \n'.format(lat)
     sql = sql[:-3] + '\n'
     sql += 'WHERE wp = ?'.format(country)
-    c.execute(sql, (country, ))
+    c.execute(sql, s)
     conn.commit()
+    return
+
+def save_country(conn, country, info):
+    sql = 'INSERT INTO countries VALUES (?, ?, ?, ?, ?)'
+    name = get_name(info)
+    capital = get_capital(info)
+    coords = get_coords(info)
+    if coords is None:
+        dat = get_info(capital)
+        coords = get_coords(dat)
+    if coords is None:
+        coords = {'lat' : 'NULL', 'lon' : 'NULL'}
+    if read_country(conn, country) is not None:
+        edit_country(conn, country, capital, coords['lat'], coords['lon'])
+    else:
+        c = conn.cursor()
+        c.execute(sql, (country, name, capital, coords['lat'], coords['lon']))
+        conn.commit()
     return
 
 def save_all(file, conn):
