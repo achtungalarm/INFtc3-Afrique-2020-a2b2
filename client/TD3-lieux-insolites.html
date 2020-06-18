@@ -93,7 +93,8 @@ function OnMarkerClick (e) {
                              '<div><span class="label">Capital : </span>' + data.cap + '</div>' +
                              '<div><span class="label">Latitude : </span>' + data.lat.toFixed(2) + '</div>' +
                              '<div><span class="label">Longitude : </span>' + data.lon.toFixed(2) + '</div>' +
-                             '<div><span class="label">Read more on : </span><a href="https://en.wikipedia.org/wiki/' + data.name + '">wikipedia</a></div>';
+                             '<div><span class="label">Read more on : </span><a href="https://en.wikipedia.org/wiki/' + data.name + '">wikipedia</a></div>' +
+                             '<img src="' + data.img + '"/>';
   };
 
   // Le numéro du lieu est récupéré via la propriété personnalisée du marqueur
