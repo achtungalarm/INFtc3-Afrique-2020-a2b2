@@ -57,7 +57,13 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
       D = self.db_get_countries()
       data=[]
       for i in range(len(D)):
-        data.append({'id':i,'lat':D[i]['latitude'],'lon':D[i]['longitude'],'name':D[i]['wp'],'cap':D[i]['capital']})
+        img = self.get_img(D[i])
+        data.append({'id':i,
+                     'lat':D[i]['latitude'],
+                     'lon':D[i]['longitude'],
+                     'name':D[i]['wp'],
+                     'cap':D[i]['capital'],
+                     'img' : img})
       for c in data:
         if c['id'] == int(self.path_info[1]):
           self.send_json(c)
@@ -274,6 +280,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     self.end_headers()
     self.wfile.write(body)
 
+  def get_img(self, data):
+    name = data['wp'].lower()
+    for file in os.listdir("client/flags"):
+      if file.startswith(name):
+        return "flags/" + file
     
 #
 # Ouverture d'une connexion avec la base de données
