@@ -1,6 +1,6 @@
 /* fond de page */
 body {
-  background-image: linear-gradient(0deg, orange 60%, aqua 70%, aqua);
+  background-image: linear-gradient(0deg, orange 80%, red 95%, red);
   background-size: 100%;
   background-repeat: no-repeat;
   color: black;
