@@ -5,10 +5,13 @@
 <title>Exemple de carte glissante</title>
 <link rel="stylesheet" type="text/css" href="leaflet.css" />
 <link rel="stylesheet" type="text/css" href="style.css"/>
+<script src="leaflet.markercluster-src.js"></script>
+<link rel="stylesheet" href="MarkerCluster.css" />
+
 
 <meta charset="utf-8">
 
-<!-- Récupération de la liste des lieux insolites au chargement de la page -->
+<!-- Récupération de la liste des pays d'Afrique au chargement de la page -->
 <body onload="load_data();">
 
   <h1>Divers pays d'Afrique</h1>
@@ -36,7 +39,19 @@ var map = L.map('map').setView([2.25,18.51], 3);
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
      }).addTo(map);
-//var markerClusters = L.markerClusterGroup();
+
+// Création d'un environnement Cluster pour rassembler les marqueurs proches
+var markerClusters = L.markerClusterGroup({
+    iconCreateFunction: function(cluster) {
+        return L.divIcon({
+            html: cluster.getChildCount(),
+            // Cluster personnalisé cf MakerCluster.css
+            className: 'mycluster',
+            iconSize: null
+        });
+    }
+});
+
 // Fonction appelée au chargement de la page
 function load_data () {
 
@@ -55,14 +70,18 @@ function load_data () {
       // insertion d'un marqueur à la position du lieu,
       // attachement d'une popup, capture de l'événement 'clic'
       // ajout d'une propriété personnalisée au marqueur
-       L.marker([data[n].lat,data[n].lon]).addTo(map)
-       .bindPopup('Lieu = '+data[n].name)
-       .addEventListener('click',OnMarkerClick)
-       .idnum = data[n].id;
-
-      // markerClusters.addLayer( m );
+ 
+       var m = L.marker([data[n].lat,data[n].lon])
+      .bindPopup('Lieu = '+data[n].name)
+      .addEventListener('click',OnMarkerClick)
+      
+      // Création d'un identifiant unique pour localiser le marqueur
+      m.idnum = data[n].id
+      
+      // Ajout du marqueur dans le Cluster
+      markerClusters.addLayer( m );
     }
-    //map.addLayer( markerClusters );
+    map.addLayer( markerClusters );
   };
 
 
@@ -87,7 +106,7 @@ function OnMarkerClick (e) {
     map.setView([data.lat,data.lon], 6);
 
     // affichage dans la zone 'description' du nom (reprise dans le popup)
-    // et de la description récupérée par l'appel au serveur
+    // et des informations récupérées par l'appel au serveur
     description.innerHTML =  '<b><i>' + e.target.getPopup().getContent() + '</i></b><br>'+
                              '<div><span class="label">Continent : </span>' + 'Afrique' + '</div>' +
                              '<div><span class="label">Capital : </span>' + data.cap + '</div>' +
@@ -100,7 +119,7 @@ function OnMarkerClick (e) {
   // Le numéro du lieu est récupéré via la propriété personnalisée du marqueur
   var idnum = e.target.idnum
 
-  // Envoi de la requête Ajax pour la récupération de la description du lieu de numéro idnum
+  // Envoi de la requête Ajax pour la récupération des informations relatives du pays de numéro idnum
   xhr.open('GET','/description/'+idnum,true);
   xhr.send();
 }
