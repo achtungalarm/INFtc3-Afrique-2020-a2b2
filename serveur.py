@@ -6,6 +6,7 @@ import http.server
 import socketserver
 import sqlite3
 import json
+import os
 
 from urllib.parse import urlparse, parse_qs, unquote
 
