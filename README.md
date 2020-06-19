@@ -35,3 +35,9 @@ La deuxième foncitonnalité que nous avons ajouté au programme python est l'en
 Nous disposions déjà des drapeaux de chacun des pays dont le nom était : nom-largeurxhauteur.png qui se situent dans le répertoire /flags. Ainsi nous avons ajouter dans la deuxième fonctionnalité l'aperçu du drapeau sur la page web.
 
 Quelques petits détails : un environnement colonne a été ajouté pour un affichage plus esthétique, la map a été agrandie en hauteur pour une meilleure visibilité, le niveau de zoom et la position par défaut a été revue pour englober tout le continent, un zoom automatique et un centrage est effectué quand on clique sur un pointeur (non adapté à la dimension du pays), l'ajout du *Clustering* qui nous permet de rassembler les marqueurs trop proches dans l'affichage en indiquant le nombre de marqueurs rassemblés, le clique sur ce dernier nous permet de zoomer sur la zone où sont rassemblés lesdits marqueurs (voir la vidéo).
+
+### Droits
+
+Les fichiers des *MarkerCluster.css* et *leaflet.markercluster-src.js* ne nous appertiennent pas, ils ont été récupéré sur https://github.com/Leaflet/Leaflet.markercluster.
+Les images des drapeaux ne nous appertiennet pas, ils ont été délivrés par l'École Centrale de Lyon.
+Le fichier *africa.zip*, *leaflet.css* et *leaflet.js* ne nous appartiennent pas, ils ont été délivré par l'École Centrale de Lyon.
