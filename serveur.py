@@ -44,26 +44,32 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     # le chemin d'accès commence par /service/country/...
     elif self.path_info[0] == 'service' and self.path_info[1] == 'country' and len(self.path_info) > 2:
       self.send_json_country(self.path_info[2])
-
+    
+    # le chemin d'accès commence par /location/... le code html demande la localisation de chaque pays pour pouvoir les placer sur la carte 
     elif self.path_info[0] == "location":
+      # On explore donc tous les pays de la base de données pour renvoyer lesdites informations
       D = self.db_get_countries()
       data=[]
       for i in range(len(D)):
+        # la clé 'id' nous permet de localiser n'importe quel pays uniquement grâce à cet identifiant
         data.append({'id':i,'lat':D[i]['latitude'],'lon':D[i]['longitude'],'name':D[i]['wp']})
       self.send_json(data)
 
-    # requete description - retourne la description du lieu dont on passe l'id en paramètre dans l'URL
+    # requete informations - retourne les informations du pays dont on passe l'id en paramètre dans l'URL
     elif self.path_info[0] == "description":
       D = self.db_get_countries()
       data=[]
       for i in range(len(D)):
+        # on récupère le nous de l'images
         img = self.get_img(D[i])
+        # On envoie toutes les informations dans l'html a besoin
         data.append({'id':i,
                      'lat':D[i]['latitude'],
                      'lon':D[i]['longitude'],
                      'name':D[i]['wp'],
                      'cap':D[i]['capital'],
                      'img' : img})
+      # on ne les envoies que au marqueur sur lequel on a cliqué
       for c in data:
         if c['id'] == int(self.path_info[1]):
           self.send_json(c)
@@ -279,7 +285,8 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     [self.send_header(*t) for t in headers]
     self.end_headers()
     self.wfile.write(body)
-
+  
+  # On cherche dans client/flags/ le fichier qui commence par le nom du pays pour le chemin d'accés
   def get_img(self, data):
     name = data['wp'].lower()
     for file in os.listdir("client/flags"):
