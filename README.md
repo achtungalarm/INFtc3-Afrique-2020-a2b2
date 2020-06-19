@@ -39,5 +39,7 @@ Quelques petits détails : un environnement colonne a été ajouté pour un affi
 ### Droits
 
 Les fichiers des *MarkerCluster.css* et *leaflet.markercluster-src.js* ne nous appertiennent pas, ils ont été récupéré sur https://github.com/Leaflet/Leaflet.markercluster.
+
 Les images des drapeaux ne nous appertiennet pas, ils ont été délivrés par l'École Centrale de Lyon.
+
 Le fichier *africa.zip*, *leaflet.css* et *leaflet.js* ne nous appartiennent pas, ils ont été délivré par l'École Centrale de Lyon.
